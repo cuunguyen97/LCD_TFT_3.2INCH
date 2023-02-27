@@ -91,7 +91,17 @@ void Lcd_WriteData_16Bit(u16 Data)
 	 SPI_WriteByte(SPI1,Data);
    LCD_CS_SET;
 }
-
+/*****************************************************************************
+ * @name       :void LCD_SetColorPoint(u16 color)
+ * @date       :2023-02-24
+ * @function   :Set color of point
+ * @parameters :color
+ * @retvalue   :None
+******************************************************************************/
+void LCD_SetColorPoint(u16 color)
+{
+	POINT_COLOR = color;
+}
 /*****************************************************************************
  * @name       :void LCD_DrawPoint(u16 x,u16 y)
  * @date       :2018-08-09 
@@ -128,7 +138,35 @@ void LCD_Clear(u16 Color)
 	}
 	 LCD_CS_SET;
 } 
-
+/*****************************************************************************
+ * @name       :void LCD_ClearCursor(u16 wXs,u16 wYs,u16 wXe,u16 wYe,u16 wColor)
+ * @date       :2023-02-24
+ * @function   :Full screen filled LCD screen
+ * @parameters :wColor:Filled color
+ * 				wXs:the bebinning x coordinate of the specified area
+                wYs:the bebinning y coordinate of the specified area
+								wXe:the ending x coordinate of the specified area
+								wYe:the ending y coordinate of the specified area
+ * @retvalue   :None
+******************************************************************************/
+void LCD_ClearCursor(u16 wXs,u16 wYs,u16 wXe,u16 wYe,u16 wColor)
+{
+	  unsigned int i,m;
+		u16 width=wXe-wXs+1;
+		u16 height=wYe-wYs+1;
+		LCD_SetWindows(wXs,wYs,wXe,wYe);
+		LCD_CS_CLR;
+		LCD_RS_SET;
+		for(i=0;i<height;i++)
+		{
+	    for(m=0;m<width;m++)
+	    {
+				Lcd_WriteData_16Bit(wColor);
+			}
+		}
+		 LCD_CS_SET;
+		 LCD_SetWindows(0,0,lcddev.width-1,lcddev.height-1);
+}
 /*****************************************************************************
  * @name       :void LCD_Clear(u16 Color)
  * @date       :2018-08-09 
@@ -143,10 +181,10 @@ void LCD_GPIOInit(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB ,ENABLE);
 	
 	GPIO_InitStructure.GPIO_Pin =  RST_GPIO| LED_GPIO|RS_GPIO| CS_GPIO;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//��ͨ���ģʽ
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   //�������
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//����
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(LCD_PORT, &GPIO_InitStructure);
 }
 

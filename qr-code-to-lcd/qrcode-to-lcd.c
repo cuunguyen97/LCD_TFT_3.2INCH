@@ -89,12 +89,12 @@ void generateQRCode(u8 byX,u8 byY,char *pByData,uint8_t byDataLength)
 	    const uint8_t byXyScale = SCALE_ONE_PIXEL;
 
 	    const uint8_t byWidth = WIDTH_LCD;
-	    const uint8_t byHeight = HEIGHT_LCD;
+	    //const uint8_t byHeight = HEIGHT_LCD;
 	    uint8_t byXmax = byWidth/2;
-	    uint8_t byYmax = byHeight/2;
+	    //uint8_t byYmax = byHeight/2;
 	    uint8_t byOffset = (byXyScale*qrcode.size);
-	    uint8_t byX1 = byXmax - (byOffset/2);
-	    uint8_t byY1 = byYmax - (byOffset/2);
+	    uint8_t byX1 = byX +byXmax - (byOffset/2);
+	    uint8_t byY1 = byY;
 
 
 	    uint8_t byPx1 = byX1;
@@ -105,7 +105,8 @@ void generateQRCode(u8 byX,u8 byY,char *pByData,uint8_t byDataLength)
 
 
 	    //Clear LCD
-	    LCD_Clear(WHITE);
+	    LCD_ClearCursor(0, byY1, 240, byY1*2 + byOffset, WHITE);
+	    //LCD_Clear(WHITE);
 
 	    // Top quiet zone
 
@@ -114,7 +115,7 @@ void generateQRCode(u8 byX,u8 byY,char *pByData,uint8_t byDataLength)
 	        for(uint8_t x = 0; x < qrcode.size; x++) {
 	            bool mod = qrcode_getModule(&qrcode,x, y);
 	            byPx1 = byX1 + x * byXyScale;
-	            byPy1 = byX1 + y * byXyScale;
+	            byPy1 = byY1 + y * byXyScale;
 	            byPx2 = byPx1 + byXyScale;
 	            byPy2 = byPy1 + byXyScale;
 	            if(mod){

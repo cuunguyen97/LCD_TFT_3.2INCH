@@ -100,9 +100,11 @@ extern u16  BACK_COLOR;
 #define LBBLUE          0X2B12
 	    															  
 void LCD_Init(void);
+void LCD_SetColorPoint(u16 color);
 void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
-void LCD_Clear(u16 Color);	 
+void LCD_Clear(u16 Color);
+void LCD_ClearCursor(u16 wXs,u16 wYs,u16 wXe,u16 wYe,u16 wColor);
 void LCD_SetCursor(u16 Xpos, u16 Ypos);
 void LCD_DrawPoint(u16 x,u16 y);
 u16  LCD_ReadPoint(u16 x,u16 y);

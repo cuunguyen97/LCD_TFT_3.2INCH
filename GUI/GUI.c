@@ -13,6 +13,7 @@
 #include "font.h"
 #include "gui.h"
 
+
 /*******************************************************************
  * @name       :void GUI_DrawPoint(u16 x,u16 y,u16 color)
  * @date       :2018-08-09 
@@ -115,6 +116,7 @@ void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2)
 	LCD_DrawLine(x1,y1,x1,y2);
 	LCD_DrawLine(x1,y2,x2,y2);
 	LCD_DrawLine(x2,y1,x2,y2);
+	LCD_SetColorPoint(BLACK);
 }  
 
 /*****************************************************************************
@@ -334,7 +336,45 @@ void Fill_Triangel(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2)
 		LCD_Fill(a,y,b,y,POINT_COLOR);
 	}
 }
-
+/*****************************************************************************
+ * @name       :void LCD_ShowTitle(u16 sizeBox,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+ * @date       :2023-02-24
+ * @function   :Prinf Title
+ * @parameters :sizeBox:the size of title box
+				fc:the color value of display character
+				bc:the background color of display character
+				*str: ascii code of display character(0~94)
+				size:the size of display character
+				mode:0-no overlying,1-overlying
+ * @retvalue   :None
+******************************************************************************/
+void LCD_ShowTitle(u16 sizeBox,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+{
+	LCD_ClearCursor(0, 0, 240, sizeBox, WHITE);
+	LCD_Fill(0, 0, 240, sizeBox, bc);
+	Gui_StrCenter(0,2,fc,bc,str,16,1);
+}
+/*****************************************************************************
+ * @name       :u16 LCD_ShowOption(u16 sizeBox,u16 y,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+ * @date       :2023-02-24
+ * @function   :Prinf Title
+ * @parameters :sizeBox:the size of title box
+				fc:the color value of display character
+				bc:the background color of display character
+				*str: ascii code of display character(0~94)
+				size:the size of display character
+				mode:0-no overlying,1-overlying
+ * @retvalue   :(u16) Cursor of the next option
+******************************************************************************/
+u16 LCD_ShowOption(u16 sizeBox,u16 y,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+{
+	u16 wCursor;
+	LCD_ClearCursor(10, y, 230, sizeBox+y, bc);
+	LCD_Fill(10, y, 20, y+sizeBox, bc);
+	Gui_StrCenter(0, y, fc, bc, str, size, mode);
+	wCursor = sizeBox+y+10;
+	return wCursor;
+}
 /*****************************************************************************
  * @name       :void LCD_ShowChar(u16 x,u16 y,u16 fc, u16 bc, u8 num,u8 size,u8 mode)
  * @date       :2018-08-09 
