@@ -11,8 +11,14 @@
 #include "lcd.h"
 #include "string.h"
 #include "font.h"
-#include "gui.h"
-
+#include "GUI.h"
+/*******************************************************************
+ * @name       :static void hexToAscii(char *pByDataOutPut,uint8_t *pByDataInPut,uint8_t byDataLength)
+ * @date       :2023-03-02
+ * @function   :
+ * @parameters :
+ * @retvalue   :None
+********************************************************************/
 
 /*******************************************************************
  * @name       :void GUI_DrawPoint(u16 x,u16 y,u16 color)
@@ -336,6 +342,7 @@ void Fill_Triangel(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2)
 		LCD_Fill(a,y,b,y,POINT_COLOR);
 	}
 }
+
 /*****************************************************************************
  * @name       :void LCD_ShowTitle(u16 sizeBox,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
  * @date       :2023-02-24
@@ -350,9 +357,9 @@ void Fill_Triangel(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2)
 ******************************************************************************/
 void LCD_ShowTitle(u16 sizeBox,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
 {
-	LCD_ClearCursor(0, 0, 240, sizeBox, WHITE);
-	LCD_Fill(0, 0, 240, sizeBox, bc);
-	Gui_StrCenter(0,2,fc,bc,str,16,1);
+	LCD_ClearCursor(0, 0, 320, sizeBox, WHITE);
+	LCD_Fill(0, 0, 320, sizeBox, bc);
+	Gui_StrCenter(0,sizeBox-size,fc,bc,str,16,1);
 }
 /*****************************************************************************
  * @name       :u16 LCD_ShowOption(u16 sizeBox,u16 y,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
@@ -369,8 +376,8 @@ void LCD_ShowTitle(u16 sizeBox,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
 u16 LCD_ShowOption(u16 sizeBox,u16 y,u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
 {
 	u16 wCursor;
-	LCD_ClearCursor(10, y, 230, sizeBox+y, bc);
-	LCD_Fill(10, y, 20, y+sizeBox, bc);
+	LCD_ClearCursor(10, y, 310, sizeBox+y, bc);
+	LCD_Fill(10, y, 310, y+sizeBox, bc);
 	Gui_StrCenter(0, y, fc, bc, str, size, mode);
 	wCursor = sizeBox+y+10;
 	return wCursor;
@@ -451,7 +458,6 @@ void LCD_ShowString(u16 x,u16 y,u8 size,u8 *p,u8 mode)
         p++;
     }  
 } 
-
 /*****************************************************************************
  * @name       :u32 mypow(u8 m,u8 n)
  * @date       :2018-08-09 
@@ -460,6 +466,267 @@ void LCD_ShowString(u16 x,u16 y,u8 size,u8 *p,u8 mode)
                 n:the power
  * @retvalue   :the nth power of m
 ******************************************************************************/ 
+void LCD_ShowNumAndStr(u16 x,u16 y,u8 size,char *pStr1,u8 lengthStr,u32 num,u8 lengthNum,u8 mode)
+{
+	char StrNum[8],StrNumFinal[8];
+	memset(StrNum,0,sizeof(StrNum));
+	memset(StrNumFinal,0,sizeof(StrNumFinal));
+	u32 numTemp,temp;
+	u8 i = 0,length;
+	LCD_ShowString(x,y,size,(u8*)pStr1,mode);
+	numTemp = num;
+	LCD_DrawLine(x, y+ size, 320-x , y+ size);
+	LCD_DrawLine(x + lengthStr-2, y - 4, x+ lengthStr-2, y + size );
+	if(numTemp == 0)
+	{
+		StrNumFinal[0] += 48;
+	}else{
+		while(numTemp !=0)
+		{
+			temp = numTemp %10;
+			if(temp<10)
+			{
+				temp +=48;
+			}else
+			{
+				temp +=55;
+			}
+			StrNum[i] = temp;
+			i++;
+			numTemp /=10;
+		}
+		length = i-1;
+
+		for(u8 k = 0; k <= length; k++)
+		{
+			i--;
+			StrNumFinal[k] = StrNum[i];
+		}
+	}
+
+	LCD_ShowString(x+lengthStr,y,size,(u8*)StrNumFinal,mode);
+
+
+}
+/*****************************************************************************
+ * @name       :u32 mypow(u8 m,u8 n)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_ShowStrAndStr(u16 x,u16 y,u8 size,char *pStr1,u8 length1,char *pStr2,u8 length2,u8 mode)
+{
+	LCD_ShowString(x,y,size,(u8*)pStr1,mode);
+	LCD_ShowString(x+length1,y,size,(u8*)pStr2,mode);
+
+	LCD_DrawLine(x, y+ size, 320-x , y+ size);
+	LCD_DrawLine(x + length1-2, y - 4, x+ length1-2, y + size );
+}
+/*****************************************************************************
+ * @name       :u32 mypow(u8 m,u8 n)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_ShowButton(u16 x,u16 y,u16 width,u16 height,u8 *pStr,u8 state)
+{
+	u16 size = 16;
+	LCD_ClearCursor(x, y, x+width, y + height, WHITE);
+	if(state == 1)
+	{
+		LCD_Fill(x , y, x+width, y + height, GREEN);
+		Gui_StrCenterV2(x, y,width, height, BLACK, WHITE, (u8*)pStr, size, 1);
+	}else
+	{
+		LCD_Fill(x, y, x+width, y + height, RED);
+		Gui_StrCenterV2(x, y,width, height, BLACK, WHITE, (u8*)pStr, size, 1);
+	}
+}
+
+/*****************************************************************************
+ * @name       :u32 mypow(u8 m,u8 n)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+u16 LCD_ShowDevice(u16 x,u16 y,u16 r,u8 *pStr,u8 state)
+{
+	//gui_circle(lcddev.width/2-80+(i*25),lcddev.height/2-50+(i*25),ColorTab[i],30,0);
+	u16 size = 16;
+	u16 len = strlen((const char*)pStr);
+	u16 str_width = len*(size/2);
+	LCD_ClearCursor(x+str_width, y, x+2*r+str_width, y + 2*r, WHITE);
+	if(state == 1)
+	{
+		Show_Str(x, y, BLACK, WHITE, pStr, size, 1);
+		gui_circle(150+r, y+size/2, BLACK, r+2, 1);
+		gui_circle(150+r, y+size/2, GREEN, r, 1);
+	}else
+	{
+		Show_Str(x, y, BLACK, WHITE, pStr, size, 1);
+		gui_circle(150+r, y+size/2, BLACK, r+2, 1);
+		gui_circle(150+r, y+size/2, RED, r, 1);
+	}
+	return 150+r;
+}
+/*****************************************************************************
+ * @name       :void LCD_UpdateDeviceState(u16 x,u16 y,u16 r,u8 state)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_UpdateDeviceState(u16 x,u16 y,u16 r,u8 state)
+{
+	//gui_circle(lcddev.width/2-80+(i*25),lcddev.height/2-50+(i*25),ColorTab[i],30,0);
+	u16 size = 16;
+	if(state == 1)
+	{
+		gui_circle(x, y+size/2, GREEN, r, 1);
+	}else
+	{
+		gui_circle(x, y+size/2, RED, r, 1);
+	}
+}
+/*****************************************************************************
+ * @name       :void LCD_ShowEditNum(u16 x,u16 y,u16 r,u8 *pStr,u32 Num)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_ShowEditNum(u16 x,u16 y,u8 *pStr,u8 lengthNum)
+{
+	u16 size = 16;
+	u16 widthStr = 100;
+	u16 widthBox = lengthNum*(size/2);
+	u16 heightBox = 20;
+	u16 XsBox = x + widthStr - 5;
+	u16 YsBox = y - 5;
+	u16 XeBox = XsBox + widthBox + 5;
+	u16 YeBox = YsBox + heightBox+ 5;
+
+
+	//Draw str
+	Show_Str(x, y, BLACK, WHITE, pStr, size, 1);
+	//Draw edit box
+	LCD_DrawRectangle(XsBox,YsBox,XeBox,YeBox);
+
+}
+/*****************************************************************************
+ * @name       :void LCD_ShowEditNum(u16 x,u16 y,u16 r,u8 *pStr,u32 Num)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_UpdateEditNum(u16 xS,u16 yS,u16 xE,u16 yE,u32 num)
+{
+	u16 size = 16;
+	u8 mode = 1;
+	//Convert hex to str
+	char StrNum[8],StrNumFinal[8];
+	u32 numTemp,temp;
+	u8 i = 0,length;
+	numTemp = num;
+	memset(StrNum,0,sizeof(StrNum));
+	memset(StrNumFinal,0,sizeof(StrNumFinal));
+	if(numTemp == 0)
+	{
+		StrNumFinal[0] += 48;
+	}else{
+		while(numTemp !=0)
+		{
+			temp = numTemp %10;
+			if(temp<10)
+			{
+				temp +=48;
+			}else
+			{
+				temp +=55;
+			}
+			StrNum[i] = temp;
+			i++;
+			numTemp /=10;
+		}
+		length = i-1;
+
+		for(u8 k = 0; k <= length; k++)
+		{
+			i--;
+			StrNumFinal[k] = StrNum[i];
+		}
+	}
+	/*
+	while(numTemp !=0)
+	{
+		temp = numTemp %10;
+		if(temp<10)
+		{
+			temp +=48;
+		}else
+		{
+			temp +=55;
+		}
+		StrNum[i] = temp;
+		i++;
+		numTemp /=10;
+	}
+	length = i-1;
+	memset(StrNumFinal,0,sizeof(StrNumFinal));
+	for(u8 k = 0; k <= length; k++)
+	{
+		i--;
+		StrNumFinal[k] = StrNum[i];
+	}*/
+	LCD_ClearCursor(xS, yS, xE, yE, WHITE);
+	Gui_StrCenterV2(xS, yS, xE-xS, yE-yS, BLACK, WHITE,(u8*) StrNumFinal, size, mode);
+}
+/*****************************************************************************
+ * @name       :void LCD_ShowBtnUpDown(u16 x0,u16 y0,u16 width,u16 height);
+ * @date       :2023-03-06
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_ShowBtnUpDown(u16 x0,u16 y0,u16 width,u16 height)
+{
+	//LCD_Fill(x0 , y0, x0+width, y0 + height, GRED);
+	LCD_DrawRectangle(x0 , y0, x0+width, y0 + height);
+	LCD_SetColorPoint(BLACK);
+	Fill_Triangel(x0+width/2, y0 + 3, x0 + width/2+width/4, y0+height/3, x0 + width/4, y0+height/3);
+	Fill_Triangel(x0+width/4, y0 + height*2/3, x0 + width/2+width/4, y0+height*2/3, x0 + width/2, y0+height-3);
+}
+/*****************************************************************************
+ * @name       :void LCD_UpdateBtnUpDown(u16 x0,u16 y0,u16 width,u16 height,u8 event);
+ * @date       :2023-03-06
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
+void LCD_UpdateBtnUpDown(u16 x0,u16 y0,u16 width,u16 height,u8 event)
+{
+
+}
+/*****************************************************************************
+ * @name       :u32 mypow(u8 m,u8 n)
+ * @date       :2018-08-09
+ * @function   :get the nth power of m (internal call)
+ * @parameters :m:the multiplier
+                n:the power
+ * @retvalue   :the nth power of m
+******************************************************************************/
 u32 mypow(u8 m,u8 n)
 {
 	u32 result=1;	 
@@ -747,13 +1014,33 @@ void Show_Str(u16 x, u16 y, u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
 								mode:0-no overlying,1-overlying
  * @retvalue   :None
 ******************************************************************************/ 
+
+void Gui_StrCenterV2(u16 x, u16 y,u16 width,u16 height, u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+{
+	u16 len=strlen((const char *)str);
+	u16 x1=(width-len*(size/2))/2;
+	Show_Str(x+x1,y,fc,bc,str,size,mode);
+}
+
+/*****************************************************************************
+ * @name       :void Gui_StrCenter(u16 x, u16 y, u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
+ * @date       :2018-08-09
+ * @function   :Centered display of English and Chinese strings
+ * @parameters :x:the bebinning x coordinate of the Chinese and English strings
+                y:the bebinning y coordinate of the Chinese and English strings
+								fc:the color value of Chinese and English strings
+								bc:the background color of Chinese and English strings
+								str:the start address of the Chinese and English strings
+								size:the size of Chinese and English strings
+								mode:0-no overlying,1-overlying
+ * @retvalue   :None
+******************************************************************************/
 void Gui_StrCenter(u16 x, u16 y, u16 fc, u16 bc, u8 *str,u8 size,u8 mode)
 {
 	u16 len=strlen((const char *)str);
-	u16 x1=(lcddev.width-len*8)/2;
+	u16 x1=(lcddev.width-len*(size/2))/2;
 	Show_Str(x1,y,fc,bc,str,size,mode);
 } 
- 
 /*****************************************************************************
  * @name       :void Gui_Drawbmp16(u16 x,u16 y,const unsigned char *p)
  * @date       :2018-08-09 

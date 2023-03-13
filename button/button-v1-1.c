@@ -43,7 +43,6 @@
 /******************************************************************************/
 static Button_t button1,button2,button3,button4,button5;
 
-
 /******************************************************************************/
 /*                              EXPORTED DATA                                 */
 /******************************************************************************/
@@ -53,6 +52,8 @@ static Button_t button1,button2,button3,button4,button5;
 /******************************************************************************/
 void buttonInit(void);
 
+uint8_t scanButtonStopStart(void);
+
 static uint32_t dwCalculatorTime(uint32_t dwTimeInit,uint32_t dwTimeCurrent);
 
 static EventButton_e checkEventButton(u8 pressCnt);
@@ -60,6 +61,7 @@ static EventButton_e checkEventButton(u8 pressCnt);
 static void GetEventButton(void);
 
 ValueKey_e processEventButton(void);
+
 /******************************************************************************/
 /*                            EXPORTED FUNCTIONS                              */
 /******************************************************************************/
@@ -73,6 +75,7 @@ void buttonInit(void)
 	RCC_AHB1PeriphClockCmd(BUTTON_1_2_GPIO_RCC, ENABLE);
 	RCC_AHB1PeriphClockCmd(BUTTON_3_4_GPIO_RCC, ENABLE);
 	RCC_AHB1PeriphClockCmd(BUTTON_5_GPIO_RCC, ENABLE);
+	//RCC_AHB1PeriphClockCmd(LED_BUTTON_PORT, ENABLE);
 	//2. Config GPIO
 	gpioInitStruct.GPIO_Mode = GPIO_Mode_IN;
 	gpioInitStruct.GPIO_Speed = GPIO_Speed_50MHz;
@@ -86,6 +89,20 @@ void buttonInit(void)
 
 	gpioInitStruct.GPIO_Pin = BUTTON_5_PIN;
 	GPIO_Init(BUTTON_5_PORT, &gpioInitStruct);
+
+	gpioInitStruct.GPIO_Pin = LED_BUTTON_PIN;
+	GPIO_Init(LED_BUTTON_PORT, &gpioInitStruct);
+}
+
+uint8_t scanButtonStopStart(void)
+{
+	uint8_t state = 0;
+	if(GPIO_ReadInputDataBit(LED_BUTTON_PORT, LED_BUTTON_PIN))
+	{
+		state = 1;
+	}else
+		state = 0;
+	return state;
 }
 static uint32_t dwCalculatorTime(uint32_t dwTimeInit,uint32_t dwTimeCurrent)
 {
@@ -97,6 +114,7 @@ static uint32_t dwCalculatorTime(uint32_t dwTimeInit,uint32_t dwTimeCurrent)
 		return (0xFFFFFFFF + dwTimeCurrent - dwTimeInit);
 	}
 }
+
 ValueKey_e processEventButton(void)
 {
 	ValueKey_e valueKeyTemp = NOKEY;
@@ -106,19 +124,27 @@ ValueKey_e processEventButton(void)
 	switch(button1.buttonEven)
 	{
 	case EVENT_OF_BUTTON_HOLD_500MS:
-		valueKeyTemp = RETURN;
+		valueKeyTemp = DOWN_HOLD;
 		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_1_TIMES:
-		valueKeyTemp = SELECT;
+		valueKeyTemp = DOWN;
 		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_2_TIMES:
-		valueKeyTemp = UP;
+		valueKeyTemp = DOWN_DOUBLE;
 		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_3_TIMES:
-		valueKeyTemp = DOWN;
+		valueKeyTemp = DOWN_TRIPLE;
+		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_4_TIMES:
+		valueKeyTemp = DOWN_QUADRUPLE;
+		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_5_TIMES:
+		valueKeyTemp = DOWN_QUINTUPLE;
 		button1.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	default:
@@ -128,11 +154,10 @@ ValueKey_e processEventButton(void)
 	switch(button2.buttonEven)
 	{
 	case EVENT_OF_BUTTON_HOLD_500MS:
-
 		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_1_TIMES:
-		valueKeyTemp = UP;
+		valueKeyTemp = RIGHT;
 		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_2_TIMES:
@@ -143,31 +168,16 @@ ValueKey_e processEventButton(void)
 
 		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
+	case EVENT_OF_BUTTON_PRESS_4_TIMES:
+		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_5_TIMES:
+		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
 	default:
 		button2.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	}
-	switch(button3.buttonEven)
-	{
-	case EVENT_OF_BUTTON_HOLD_500MS:
-		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
-		break;
-	case EVENT_OF_BUTTON_PRESS_1_TIMES:
-		valueKeyTemp = DOWN;
-		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
-		break;
-	case EVENT_OF_BUTTON_PRESS_2_TIMES:
-		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
-		break;
-	case EVENT_OF_BUTTON_PRESS_3_TIMES:
-		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
-		break;
-	default:
-		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
-		break;
-	}
-
-
 	switch(button4.buttonEven)
 	{
 	case EVENT_OF_BUTTON_HOLD_500MS:
@@ -183,23 +193,71 @@ ValueKey_e processEventButton(void)
 	case EVENT_OF_BUTTON_PRESS_3_TIMES:
 		button4.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
+	case EVENT_OF_BUTTON_PRESS_4_TIMES:
+		button4.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_5_TIMES:
+		button4.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
 	default:
 		button4.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	}
+
+
+	switch(button3.buttonEven)
+	{
+	case EVENT_OF_BUTTON_HOLD_500MS:
+		valueKeyTemp = UP_HOLD;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_1_TIMES:
+		valueKeyTemp = UP;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_2_TIMES:
+		valueKeyTemp = UP_DOUBLE;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_3_TIMES:
+		valueKeyTemp = UP_TRIPLE;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_4_TIMES:
+		valueKeyTemp = UP_QUADRUPLE;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_5_TIMES:
+		valueKeyTemp = UP_QUINTUPLE;
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	default:
+		button3.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	}
+
+
 	switch(button5.buttonEven)
 	{
 	case EVENT_OF_BUTTON_HOLD_500MS:
+		valueKeyTemp = RETURN;
 		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_1_TIMES:
-		valueKeyTemp = RIGHT;
+		valueKeyTemp = SELECT;
 		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_2_TIMES:
+		valueKeyTemp = SELECT_DOUBLE;
 		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	case EVENT_OF_BUTTON_PRESS_3_TIMES:
+		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_4_TIMES:
+		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
+		break;
+	case EVENT_OF_BUTTON_PRESS_5_TIMES:
 		button5.buttonEven = EVENT_OF_BUTTON_NOCLICK;
 		break;
 	default:
@@ -497,7 +555,7 @@ static void GetEventButton(void)
 				//Xu ly khi nhan giu
 				if((button4.byFlagBtn1Press == 1 )&&(button4.byFlagBtn1Released == 0))
 				{
-					dwDeltaTime = dwCalculatorTime(button4.dwTimeInit,dwTimeNow);
+					dwDeltaTime = dwCalculatorTime(button3.dwTimeInit,dwTimeNow);
 					if(dwDeltaTime>BUTTON_LONG_PRESS_TIME)
 					{
 						button4.buttonEven = EVENT_OF_BUTTON_HOLD_500MS;
@@ -655,6 +713,12 @@ static EventButton_e checkEventButton(u8 pressCnt)
 		break;
 	case 3:
 		event = EVENT_OF_BUTTON_PRESS_3_TIMES;
+		break;
+	case 4:
+		event = EVENT_OF_BUTTON_PRESS_4_TIMES;
+		break;
+	case 5:
+		event = EVENT_OF_BUTTON_PRESS_5_TIMES;
 		break;
 	default:
 		event = EVENT_OF_BUTTON_NOCLICK;

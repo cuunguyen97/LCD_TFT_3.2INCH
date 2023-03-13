@@ -1,4 +1,4 @@
-/*******************************************************************************
+/******************************************************************************
  *				 _ _                                             _ _
 				|   |                                           (_ _)
 				|   |        _ _     _ _   _ _ _ _ _ _ _ _ _ _   _ _
@@ -7,51 +7,52 @@
 				|   |       |   |   |   | |   |   |   |   |   | |   |
 				|   |_ _ _  |   |_ _|   | |   |   |   |   |   | |   |
 				|_ _ _ _ _| |_ _ _ _ _ _| |_ _|   |_ _|   |_ _| |_ _|
-								(C)2023 Lumi
- * Copyright (c) 2023
+								(C)2021 Lumi
+ * Copyright (c) 2021
  * Lumi, JSC.
  * All Rights Reserved
  *
- * File name: qrcode-to-lcd.h
+ * flash.h
  *
  * Description:
  *
- * Author: CuuNV
+ *  Created on: Oct 22, 2021
+ *      Author: PhuongNP
+ * Last Changed By:  $Author: 		$
+ * Revision:         $Revision:	V1.0.0$
+ * Last Changed:     $Date: 		$
  *
- * Last Changed By:  $Author: CuuNV $
- * Revision:         $Revision: $
- * Last Changed:     $Date: $Jan 28, 2023
- *
- * Code sample:
  ******************************************************************************/
-#ifndef SDK_1_0_3_NUCLEO_F401RE_SHARED_MIDDLE_QR_CODE_TO_LCD_ST7735S_QRCODE_TO_LCD_H_
-#define SDK_1_0_3_NUCLEO_F401RE_SHARED_MIDDLE_QR_CODE_TO_LCD_ST7735S_QRCODE_TO_LCD_H_
+#ifndef MIDDLE_FLASH_FLASH_H_
+#define MIDDLE_FLASH_FLASH_H_
 /******************************************************************************/
 /*                              INCLUDE FILES                                 */
 /******************************************************************************/
-#include <qrcode.h>
-#include <lcd.h>
+#include "stm32f401re.h"
 /******************************************************************************/
 /*                     EXPORTED TYPES and DEFINITIONS                         */
 /******************************************************************************/
-//1. define for LCD
-#define WIDTH_LCD			240u
-#define HEIGHT_LCD			240u
-#define SCALE_ONE_PIXEL		3
+#define USER_FLASH_FIRST_PAGE_ADDRESS 			0x08010000		//Sector 4(64kB)
+#define USER_FLASH_PAGE_SIZE					(128*1024)		//128kB
 
-//2. define for Qr_code
-	// Level of error correction(0-3): 0~ 7%,1~ 15%, 2 ~25%, 3 ~ 30%
-#define ECC_LEVEL			0
-	// Version of Qrcode (MAX 6)
-#define VERSION_OF_QR		6
-
+#define FLASH_USERDATA_VALID							0x5A5A5A5A
+#define FLASH_USERDATA_INVALID							0x50505050
+#define FLASH_USERDATA_IDLE								0xFFFFFFFF
 /******************************************************************************/
 /*                              PRIVATE DATA                                  */
 /******************************************************************************/
+typedef struct{
+	uint32_t Used;
+	uint32_t countMax;
+	uint32_t tHold;
+	uint32_t Data;
 
+}UserData_t;
 
-uint8_t checkDataLength(uint8_t byDataLength, uint8_t byEccLevel, uint8_t byVersion);
-void generateQRCode(u8 byX,u8 byY,char *pByData,uint8_t byDataLength);
+#define WORD_SIZE					(sizeof(uint32_t))
+#define USERDATA_BYTES_SIZE			(sizeof(UserData_t))
+#define USERDATA_WORDS_SIZE			(sizeof(UserData_t)/WORD_SIZE)
+#define MAX_NUMBER_OF_USERDATA_IN_SECTOR	((uint32_t)(USER_FLASH_PAGE_SIZE/USERDATA_WORDS_SIZE))
 /******************************************************************************/
 /*                              EXPORTED DATA                                 */
 /******************************************************************************/
@@ -63,8 +64,13 @@ void generateQRCode(u8 byX,u8 byY,char *pByData,uint8_t byDataLength);
 /******************************************************************************/
 /*                            EXPORTED FUNCTIONS                              */
 /******************************************************************************/
-
+void FLASH_Init(void);
+uint8_t FLASH_IsUserDataChange(void);
+void FLASH_RamToFlash(void);
+UserData_t *FLASH_GetUserData();
 /******************************************************************************/
 
 
-#endif /* SDK_1_0_3_NUCLEO_F401RE_SHARED_MIDDLE_QR_CODE_TO_LCD_ST7735S_QRCODE_TO_LCD_H_ */
+
+
+#endif /* MIDDLE_FLASH_FLASH_H_ */

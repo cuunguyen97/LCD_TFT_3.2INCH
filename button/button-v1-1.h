@@ -38,7 +38,7 @@
 /*                     EXPORTED TYPES and DEFINITIONS                         */
 /******************************************************************************/
 
-//define of button 1:PB1-- Select/Return,button 2:PB2--Up
+//define of button 1:PB1--Down ,button 2:PB2--Right
 #define BUTTON_1_PIN				GPIO_Pin_1
 #define BUTTON_1_PINSOURCE			GPIO_PinSource1
 #define BUTTON_2_PIN				GPIO_Pin_2
@@ -57,7 +57,7 @@
 #define BUTTON_1_2_GPIO_RCC			RCC_AHB1Periph_GPIOB
 #define BUTTON_1_2_EXTI_PORTSOURCE  EXTI_PortSourceGPIOB
 
-//define of button 3:PC3--Down,button 4:PC0--Left
+//define of button 3:PC3--Up,button 4:PC0--Left
 #define BUTTON_3_PIN				GPIO_Pin_3
 #define BUTTON_4_PIN				GPIO_Pin_0
 
@@ -78,7 +78,7 @@
 #define BUTTON_3_NVIC_IRQCHANNEL 	EXTI3_IRQn
 #define BUTTON_4_NVIC_IRQCHANNEL 	EXTI0_IRQn
 
-//define of button 5:PA5--Right
+//define of button 5:PA5--Select/Return
 #define BUTTON_5_PIN				GPIO_Pin_5
 #define BUTTON_5_PINSOURCE			GPIO_PinSource5
 #define BUTTON_5_PORT				GPIOA
@@ -87,6 +87,10 @@
 #define BUTTON_5_EXTI_PORTSOURCE  	EXTI_PortSourceGPIOA
 #define BUTTON_5_EXTI_LINE			EXTI_Line0
 #define BUTTON_5_NVIC_IRQCHANNEL 	EXTI9_5_IRQn
+//define of LedButton:PB9
+#define LED_BUTTON_PIN				GPIO_Pin_9
+#define LED_BUTTON_PORT				GPIOB
+#define LED_BUTTON_RCC				RCC_AHB1Periph_GPIOB
 
 #define BUTTON_DEBOUNCE_TIME      		5u
 #define BUTTON_NORMAL_PRESS_TIME  		60u
@@ -118,6 +122,8 @@ typedef enum
 	EVENT_OF_BUTTON_PRESS_1_TIMES,
 	EVENT_OF_BUTTON_PRESS_2_TIMES,
 	EVENT_OF_BUTTON_PRESS_3_TIMES,
+	EVENT_OF_BUTTON_PRESS_4_TIMES,
+	EVENT_OF_BUTTON_PRESS_5_TIMES,
 	EVENT_OF_BUTTON_HOLD_500MS,
 	EVENT_OF_BUTTON_RELEASED,
 
@@ -126,8 +132,20 @@ typedef enum
 {
 	NOKEY,
 	SELECT,
+	SELECT_DOUBLE,
 	UP,
+	UP_DOUBLE,
+	UP_TRIPLE,
+	UP_QUADRUPLE,
+	UP_QUINTUPLE,
+	UP_HOLD,
 	DOWN,
+	DOWN_DOUBLE,
+	DOWN_TRIPLE,
+	DOWN_QUADRUPLE,
+	DOWN_QUINTUPLE,
+	DOWN_HOLD,
+
 	LEFT,
 	RIGHT,
 	RETURN
@@ -154,7 +172,7 @@ typedef struct
 /*                            PRIVATE FUNCTIONS                               */
 /******************************************************************************/
 void buttonInit(void);
-
+uint8_t scanButtonStopStart(void);
 ValueKey_e processEventButton(void);
 /******************************************************************************/
 /*                            EXPORTED FUNCTIONS                              */

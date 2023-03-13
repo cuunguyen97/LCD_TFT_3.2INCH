@@ -152,8 +152,8 @@ void LCD_Clear(u16 Color)
 void LCD_ClearCursor(u16 wXs,u16 wYs,u16 wXe,u16 wYe,u16 wColor)
 {
 	  unsigned int i,m;
-		u16 width=wXe-wXs+1;
-		u16 height=wYe-wYs+1;
+		u16 width=wXe-wXs-1;
+		u16 height=wYe-wYs-1;
 		LCD_SetWindows(wXs,wYs,wXe,wYe);
 		LCD_CS_CLR;
 		LCD_RS_SET;
@@ -215,7 +215,7 @@ void LCD_RESET(void)
 void LCD_Init(void)
 {  
 	SPI1_Init(); //Ӳ��SPI��ʼ��
-//	SPI_SetSpeed(SPI1,SPI_BaudRatePrescaler_2);
+	//SPI_SetSpeed(SPI1,SPI_BaudRatePrescaler_2);
 	LCD_GPIOInit();//LCD GPIO��ʼ��										 
  	LCD_RESET(); //LCD ��λ
 //*************3.2inch ILI9341��ʼ��**********//	
@@ -313,7 +313,7 @@ void LCD_Init(void)
 	delay_ms(120);
 	LCD_WR_REG(0x29); //display on		
 
-  LCD_direction(USE_HORIZONTAL);
+	LCD_direction(USE_HORIZONTAL);
 	LCD_LED=1;
 	LCD_Clear(WHITE);
 }

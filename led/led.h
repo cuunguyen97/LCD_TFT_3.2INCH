@@ -1,35 +1,49 @@
 /*******************************************************************************
- *
- * Copyright (c) 2020
+ *				 _ _                                             _ _
+				|   |                                           (_ _)
+				|   |        _ _     _ _   _ _ _ _ _ _ _ _ _ _   _ _
+				|   |       |   |   |   | |    _ _     _ _    | |   |
+				|   |       |   |   |   | |   |   |   |   |   | |   |
+				|   |       |   |   |   | |   |   |   |   |   | |   |
+				|   |_ _ _  |   |_ _|   | |   |   |   |   |   | |   |
+				|_ _ _ _ _| |_ _ _ _ _ _| |_ _|   |_ _|   |_ _| |_ _|
+								(C)2023 Lumi
+ * Copyright (c) 2023
  * Lumi, JSC.
  * All Rights Reserved
  *
+ * File name: led.h
  *
  * Description:
  *
- * Author: HoangNH
+ * Author: CuuNV
  *
- * Last Changed By:  $Author: HoangNH $
- * Revision:         $Revision: 1.1  $
- * Last Changed:     $Date: 10/07/20 $
+ * Last Changed By:  $Author: CuuNV $
+ * Revision:         $Revision: $
+ * Last Changed:     $Date: $Mar 1, 2023
  *
+ * Code sample:
  ******************************************************************************/
-#ifndef _EVENT_MAN_H_
-#define _EVENT_MAN_H_
+#ifndef MIDDLE_LED_LED_H_
+#define MIDDLE_LED_LED_H_
 /******************************************************************************/
 /*                              INCLUDE FILES                                 */
 /******************************************************************************/
-#include <buff.h>
-#include <stdint.h>
+
 /******************************************************************************/
 /*                     EXPORTED TYPES and DEFINITIONS                         */
 /******************************************************************************/
-typedef enum {
-    SUCCESS = 1,
-    FAIL = 0,
-} type_status_t;
+#define LED_RED_GPIO		GPIO_Pin_1
+#define LED_RED_PORT		GPIOA
+#define LED_RED_RCC			RCC_AHB1Periph_GPIOA
 
-typedef void (*app_state_callback)(uint8_t);
+#define LED_GREEN_1_GPIO	GPIO_Pin_4
+#define LED_GREEN_1_PORT	GPIOA
+#define LED_GREEN_1_RCC		RCC_AHB1Periph_GPIOA
+
+#define LED_GREEN_2_GPIO	GPIO_Pin_0
+#define LED_GREEN_2_PORT	GPIOB
+#define LED_GREEN_2_RCC		RCC_AHB1Periph_GPIOB
 /******************************************************************************/
 /*                              PRIVATE DATA                                  */
 /******************************************************************************/
@@ -37,44 +51,30 @@ typedef void (*app_state_callback)(uint8_t);
 /******************************************************************************/
 /*                              EXPORTED DATA                                 */
 /******************************************************************************/
-
+typedef enum{
+STOP,
+ERROR_DEVICE,
+RUN,
+PAUSE
+}DeviceState_e;
 /******************************************************************************/
 /*                            PRIVATE FUNCTIONS                               */
 /******************************************************************************/
-
+void ledInit(void);
+/*
+ * state->NONE,
+		PUSH_UP,
+		PUSH_UP_DONE,
+		PUSH_DOWN,
+		PUSH_DOWN_DONE,
+		CHECK_CURRENT_SENSOR
+ */
+void controlLed(DeviceState_e state);
 /******************************************************************************/
 /*                            EXPORTED FUNCTIONS                              */
 /******************************************************************************/
 
-/**
- * @func   EventSchedulerInit 
- * @brief  None
- * @param  None
- * @retval None
- */
-void
-EventSchedulerInit(
-    app_state_callback func
-);
+/******************************************************************************/
 
-/**
- * @func   EventSchedulerAdd 
- * @brief  Add event to queue
- * @param  pvItemToQueue
- * @retval None
- */
-type_status_t
-EventSchedulerAdd(
-    const uint8_t pvItemToQueue
-);
 
-/**
- * @func   EventScheduler 
- * @brief  Proccess event in queue
- * @param  None
- * @retval None
- */
-void
-processEventScheduler(void);
-
-#endif /* END FILE */
+#endif /* MIDDLE_LED_LED_H_ */
